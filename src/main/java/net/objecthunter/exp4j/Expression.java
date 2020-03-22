@@ -17,6 +17,7 @@ package net.objecthunter.exp4j;
 
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.function.Functions;
+import net.objecthunter.exp4j.function.MaxArgsFunction;
 import net.objecthunter.exp4j.operator.Operator;
 import net.objecthunter.exp4j.tokenizer.FunctionToken;
 import net.objecthunter.exp4j.tokenizer.NumberToken;
@@ -208,6 +209,23 @@ public class Expression {
                 }
             } else if (t.getType() == Token.TOKEN_FUNCTION) {
                 FunctionToken func = (FunctionToken) t;
+                if (func.getFunction() instanceof MaxArgsFunction) {
+                    if (func.getFunction().getNumArguments() == 0) {
+                        output.push(func.getFunction().apply());
+                        continue;
+                    }
+                    final int numArguments = output.size();
+                    if (numArguments > func.getFunction().getNumArguments()) {
+                        throw new IllegalArgumentException("Invalid number of arguments available for '" + func.getFunction().getName() + "' function");
+                    }
+                    /* collect the arguments from the stack */
+                    double[] args = new double[numArguments];
+                    for (int j = numArguments - 1; j >= 0; j--) {
+                        args[j] = output.pop();
+                    }
+                    output.push(func.getFunction().apply(args));
+                    continue;
+                }
                 final int numArguments = func.getFunction().getNumArguments();
                 if (output.size() < numArguments) {
                     throw new IllegalArgumentException("Invalid number of arguments available for '" + func.getFunction().getName() + "' function");
