@@ -136,7 +136,14 @@ public class Expression {
                     break;
                 case Token.TOKEN_FUNCTION:
                     final Function func = ((FunctionToken) tok).getFunction();
-                    final int argsNum = func.getNumArguments(); 
+                    final int argsNum = func.getNumArguments();
+                    if (func instanceof MaxArgsFunction) {
+                        if (count > argsNum) {
+                            errors.add("Too much arguments for '" + func.getName() + "'");
+                        }
+                        count = 1;
+                        break;
+                    }
                     if (argsNum > count) {
                         errors.add("Not enough arguments for '" + func.getName() + "'");
                     }
