@@ -128,6 +128,7 @@ public class Expression {
            The count has to be larger than 1 at all times and exactly 1 after all tokens
            have been processed */
         int count = 0;
+        int amountOfMaxArgsFunctions = 0;
         for (Token tok : this.tokens) {
             switch (tok.getType()) {
                 case Token.TOKEN_NUMBER:
@@ -141,7 +142,7 @@ public class Expression {
                         if (count > argsNum) {
                             errors.add("Too much arguments for '" + func.getName() + "'");
                         }
-                        count = 1;
+                        count = 1 + amountOfMaxArgsFunctions++;
                         break;
                     }
                     if (argsNum > count) {
@@ -166,7 +167,7 @@ public class Expression {
                 return new ValidationResult(false, errors);
             }
         }
-        if (count > 1) {
+        if (count - amountOfMaxArgsFunctions > 1) {
             errors.add("Too many operands");
         }
         return errors.size() == 0 ? ValidationResult.SUCCESS : new ValidationResult(false, errors);
@@ -188,6 +189,7 @@ public class Expression {
 
     public double evaluate() {
         final ArrayStack output = new ArrayStack();
+        int amountOfMaxArgsFunctions = 0;
         for (int i = 0; i < tokens.length; i++) {
             Token t = tokens[i];
             if (t.getType() == Token.TOKEN_NUMBER) {
@@ -221,7 +223,7 @@ public class Expression {
                         output.push(func.getFunction().apply());
                         continue;
                     }
-                    final int numArguments = output.size();
+                    final int numArguments = output.size() - amountOfMaxArgsFunctions++;
                     if (numArguments > func.getFunction().getNumArguments()) {
                         throw new IllegalArgumentException("Invalid number of arguments available for '" + func.getFunction().getName() + "' function");
                     }

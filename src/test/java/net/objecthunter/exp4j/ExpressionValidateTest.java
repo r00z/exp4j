@@ -16,10 +16,11 @@
 package net.objecthunter.exp4j;
 
 import net.objecthunter.exp4j.function.Function;
-
+import net.objecthunter.exp4j.function.MaxArgsFunction;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
@@ -61,6 +62,13 @@ public class ExpressionValidateTest {
 				eta += a;
 			}
 			return eta;
+		}
+	};
+
+	Function max = new MaxArgsFunction("max", 10) {
+		@Override
+		public double apply(double... args) {
+			return 10d;
 		}
 	};
 
@@ -219,6 +227,33 @@ public class ExpressionValidateTest {
 		Expression exp = new ExpressionBuilder("eta(1, 2, 3, 4, 5, 6, 7) * 2 * 3 * 4")
 			.functions(eta)
 			.build();
+		ValidationResult result = exp.validate(false);
+		Assert.assertTrue(result.isValid());
+	}
+
+	@Test
+	public void testValidateSumFunctionsWithManyArguments() throws Exception {
+		Expression exp = new ExpressionBuilder("max(1,2,3) + max(3,2,1)")
+				.functions(max)
+				.build();
+		ValidationResult result = exp.validate(false);
+		Assert.assertTrue(result.isValid());
+	}
+
+	@Test
+	public void testValidateNestedSumFunctionsWithManyArguments() throws Exception {
+		Expression exp = new ExpressionBuilder("max(1,2,beta(1,2),max(3,2,1)) + beta(3,4)")
+				.functions(max,beta)
+				.build();
+		ValidationResult result = exp.validate(false);
+		Assert.assertTrue(result.isValid());
+	}
+
+	@Test
+	public void testValidateNestedSumFunctionsWithManyArguments2() throws Exception {
+		Expression exp = new ExpressionBuilder("max(1,2,beta(1,2),max(3,2,1))")
+				.functions(max,beta)
+				.build();
 		ValidationResult result = exp.validate(false);
 		Assert.assertTrue(result.isValid());
 	}
