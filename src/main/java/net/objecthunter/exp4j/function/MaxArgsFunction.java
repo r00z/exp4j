@@ -11,14 +11,14 @@ public abstract class MaxArgsFunction extends Function {
     protected final int minNumArguments;
 
     public MaxArgsFunction(String name) {
-        this(name, DEFAULT_MAX_NUM_ARGUMENTS, DEFAULT_MIN_NUM_ARGUMENTS);
+        this(name, DEFAULT_MIN_NUM_ARGUMENTS, DEFAULT_MAX_NUM_ARGUMENTS);
     }
 
     public MaxArgsFunction(String name, int maxNumArguments) {
-        this(name, maxNumArguments, DEFAULT_MIN_NUM_ARGUMENTS);
+        this(name, DEFAULT_MIN_NUM_ARGUMENTS, maxNumArguments);
     }
 
-    public MaxArgsFunction(String name, int maxNumArguments, int minNumArguments) {
+    public MaxArgsFunction(String name, int minNumArguments, int maxNumArguments) {
         super(name, maxNumArguments);
         if (minNumArguments < 0 || minNumArguments > maxNumArguments) {
             throw new IllegalArgumentException("Invalid number of function arguments for '" + name + "'");
