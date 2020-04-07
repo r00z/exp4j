@@ -20,6 +20,9 @@ public abstract class MaxArgsFunction extends Function {
 
     public MaxArgsFunction(String name, int maxNumArguments, int minNumArguments) {
         super(name, maxNumArguments);
+        if (minNumArguments < 0 || minNumArguments > maxNumArguments) {
+            throw new IllegalArgumentException("Invalid number of function arguments for '" + name + "'");
+        }
         this.minNumArguments = minNumArguments;
     }
 
