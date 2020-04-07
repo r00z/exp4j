@@ -251,7 +251,7 @@ public class ExpressionValidateTest {
 
 	@Test
 	public void testValidateNestedSumFunctionsWithManyArguments2() throws Exception {
-		Expression exp = new ExpressionBuilder("max(1,2,beta(1,2),max(3,2,1))")
+		Expression exp = new ExpressionBuilder("max(1,2,beta(3,4),max(5,6,7))")
 				.functions(max,beta)
 				.build();
 		ValidationResult result = exp.validate(false);
@@ -341,5 +341,24 @@ public class ExpressionValidateTest {
 				.build();
 		assertTrue(e.validate().isValid());
 	}
+
+	@Test
+	public void testValidateMaxFunctionsWithLessArguments() throws Exception {
+		Expression exp = new ExpressionBuilder("max(1) + max()")
+				.functions(max)
+				.build();
+		ValidationResult result = exp.validate(false);
+		Assert.assertFalse(result.isValid());
+	}
+
+	@Test
+	public void testValidateNestedMaxFunctionsWithLessArguments() throws Exception {
+		Expression exp = new ExpressionBuilder("max(1,2,beta(1,2),max(3)) + beta(3,4)")
+				.functions(max,beta)
+				.build();
+		ValidationResult result = exp.validate(false);
+		Assert.assertFalse(result.isValid());
+	}
+
 
 }

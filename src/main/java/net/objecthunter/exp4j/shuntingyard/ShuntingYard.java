@@ -19,6 +19,7 @@ import java.util.*;
 
 import net.objecthunter.exp4j.function.Function;
 import net.objecthunter.exp4j.operator.Operator;
+import net.objecthunter.exp4j.tokenizer.FunctionToken;
 import net.objecthunter.exp4j.tokenizer.OperatorToken;
 import net.objecthunter.exp4j.tokenizer.Token;
 import net.objecthunter.exp4j.tokenizer.Tokenizer;
@@ -41,6 +42,7 @@ public class ShuntingYard {
         final Stack<Token> stack = new Stack<Token>();
         final List<Token> output = new ArrayList<Token>();
 
+        final Stack<FunctionToken> functionTokenStack = new Stack<FunctionToken>();
         final Tokenizer tokenizer = new Tokenizer(expression, userFunctions, userOperators, variableNames, implicitMultiplication);
         while (tokenizer.hasNext()) {
             Token token = tokenizer.nextToken();
@@ -50,9 +52,12 @@ public class ShuntingYard {
                 output.add(token);
                 break;
             case Token.TOKEN_FUNCTION:
+                functionTokenStack.add((FunctionToken) token);
                 stack.add(token);
                 break;
             case Token.TOKEN_SEPARATOR:
+                if (!functionTokenStack.empty())
+                    functionTokenStack.peek().incArgument();
                 while (!stack.empty() && stack.peek().getType() != Token.TOKEN_PARENTHESES_OPEN) {
                     output.add(stack.pop());
                 }
@@ -84,6 +89,7 @@ public class ShuntingYard {
                 }
                 stack.pop();
                 if (!stack.isEmpty() && stack.peek().getType() == Token.TOKEN_FUNCTION) {
+                    functionTokenStack.pop();
                     output.add(stack.pop());
                 }
                 break;
